@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.Objects;
 
+// Проверка добавления новой посылки в коробку. Если максимальный вес не превышен, посылка должна добавляться, а если превышен — нет.
+
 public class ParcelBox<T extends Parcel> {
     private int maxWeight;
     private String boxName;
@@ -10,12 +12,18 @@ public class ParcelBox<T extends Parcel> {
         this.boxName = boxName;
         this.maxWeight = maxWeight;
     }
-    public void addParcel(T parcel){
-boxWithParcel.add(parcel);
-        System.out.println("Посылка добавлена в коробку");
+
+    public void addParcel(ParcelBox box, T parcel) {
+        if (!(parcel.getWeight() + box.maxWeight > box.getMaxWeight())) {
+            boxWithParcel.add(parcel);
+            System.out.println("Посылка добавлена в коробку");
+        }else System.out.println("Данная посылка не может быть добавлена в коробку, поскольку " +
+                "превышается максимальный вес коробки");
+
     }
-    public ArrayList<T> getAllParcels(){
-return boxWithParcel;
+
+    public ArrayList<T> getAllParcels() {
+        return boxWithParcel;
     }
 
     public int getCurrentWeight() {
@@ -28,6 +36,10 @@ return boxWithParcel;
 
     public int getMaxWeight() {
         return maxWeight;
+    }
+
+    public boolean isParcelInBox(T parcel){
+        return boxWithParcel.contains(parcel);
     }
 
     @Override

@@ -1,11 +1,11 @@
 import java.util.Objects;
 
 abstract public class Parcel {
-    protected static String description;
+    protected String description;
     protected int weight;
     protected String deliveryAddress;
     protected int sendDay;
-    protected int baseCost=2;
+    protected int baseCost = 2;
 
 
     Parcel(String description, int weight, String deliveryAddress, int sendDay) {
@@ -14,14 +14,17 @@ abstract public class Parcel {
         this.deliveryAddress = deliveryAddress;
         this.sendDay = sendDay;
     }
-    void packageItem(){
-        System.out.println("Посылка " +description+ " упакована");
+
+    void packageItem() {
+        System.out.println("Посылка " + description + " упакована");
     }
-    void deliver(){
+
+    void deliver() {
         System.out.println("Посылка " + description + " доставлена по адресу " + deliveryAddress);
     }
-    int calculateDeliveryCost(){
-        int cost = weight*baseCost;
+
+    int calculateDeliveryCost() {
+        int cost = weight * baseCost;
         return cost;
     }
 

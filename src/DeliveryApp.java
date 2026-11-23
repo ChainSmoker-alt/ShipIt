@@ -2,7 +2,13 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DeliveryApp <T>{
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+
+public class DeliveryApp {
 
     private static final Scanner scanner = new Scanner(System.in);
     private static List<Parcel> allParcels = new ArrayList<>();
@@ -179,14 +185,10 @@ public class DeliveryApp <T>{
                     System.out.println("Вы вводите название коробки");
                     String boxName = scanner.nextLine();
                     ParcelBox<StandardParcel> standardBox = new ParcelBox<>(maxWeight, boxName);
-                    int totalWeight = standardBox.getCurrentWeight();
-                    if (!(totalWeight + newParcel.getWeight() > standardBox.getMaxWeight())) {
-                        standardBox.addParcel(newParcel);
-                        if (!listOfStandardBox.contains(standardBox)) {
-                            listOfStandardBox.add(standardBox);
-                        }
-                    }else System.out.println("Данная посылка не может быть добавлена в коробку, поскольку " +
-                            "превышается максимальный вес коробки");
+                    standardBox.addParcel(standardBox, newParcel);
+                    if (!listOfStandardBox.contains(standardBox)) {
+                        listOfStandardBox.add(standardBox);
+                    }
                 } else System.out.println("Посылка не найдена");
                 break;
             case "хрупкая":
@@ -199,14 +201,10 @@ public class DeliveryApp <T>{
                     System.out.println("Вы вводите название коробки");
                     String boxName = scanner.nextLine();
                     ParcelBox<FragileParcel> fragileBox = new ParcelBox<>(maxWeight, boxName);
-                    int totalWeight = fragileBox.getCurrentWeight();
-                    if (!(totalWeight + newFragileParcel.getWeight() > fragileBox.getMaxWeight())) {
-                        fragileBox.addParcel(newFragileParcel);
-                        if (!listOfFragileBox.contains(fragileBox)) {
-                            listOfFragileBox.add(fragileBox);
-                        }
-                    }else System.out.println("Данная посылка не может быть добавлена в коробку, поскольку " +
-                            "превышается максимальный вес коробки");
+                    fragileBox.addParcel(fragileBox, newFragileParcel);
+                    if (!listOfFragileBox.contains(fragileBox)) {
+                        listOfFragileBox.add(fragileBox);
+                    }
                 } else System.out.println("Посылка не найдена");
                 break;
             case "скоропортящаяся":
@@ -223,14 +221,10 @@ public class DeliveryApp <T>{
                     System.out.println("Вы вводите название коробки");
                     String boxName = scanner.nextLine();
                     ParcelBox<PerishableParcel> perishableBox = new ParcelBox<>(maxWeight, boxName);
-                    int totalWeight = perishableBox.getCurrentWeight();
-                    if (!(totalWeight + newPerishableParcel.getWeight() > perishableBox.getMaxWeight())) {
-                        perishableBox.addParcel(newPerishableParcel);
-                        if (!listOfPerishableBox.contains(perishableBox)) {
-                            listOfPerishableBox.add(perishableBox);
-                        }
-                    }else System.out.println("Данная посылка не может быть добавлена в коробку, поскольку " +
-                            "превышается максимальный вес коробки");
+                    perishableBox.addParcel(perishableBox, newPerishableParcel);
+                    if (!listOfPerishableBox.contains(perishableBox)) {
+                        listOfPerishableBox.add(perishableBox);
+                    }
                 } else System.out.println("Посылка не найдена");
                 break;
             default:
@@ -247,7 +241,7 @@ public class DeliveryApp <T>{
         String boxName = scanner.nextLine();
         System.out.println("Вы вводите максимальный вес коробки");
         int boxWeight = Integer.parseInt(scanner.nextLine());
-        switch (typeOfBox){
+        switch (typeOfBox) {
             case "стандартная":
                 printBox(listOfStandardBox, boxWeight, boxName);
                 break;
@@ -262,18 +256,19 @@ public class DeliveryApp <T>{
                 break;
         }
     }
-    private static <T extends Parcel> void printBox(List<ParcelBox<T>> parcelBoxes, int boxWeight, String boxName){
+
+    private static <T extends Parcel> void printBox(List<ParcelBox<T>> parcelBoxes, int boxWeight, String boxName) {
         ParcelBox<T> box = new ParcelBox<>(boxWeight, boxName);
         int index = -1;
-        if(parcelBoxes.contains(box)){
+        if (parcelBoxes.contains(box)) {
             index = parcelBoxes.indexOf(box);
         }
-        if(index!=-1){
+        if (index != -1) {
             System.out.println(parcelBoxes.get(index).getAllParcels());
         }
     }
 
-    private static void checkIfExpired(){
+    private static void checkIfExpired() {
         System.out.println("Введите описание, вес, адрес доставки, день отправления посылки");
         System.out.println("Вы вводите описание посылки");
         String descriptionOfParcel = scanner.nextLine();
@@ -294,14 +289,14 @@ public class DeliveryApp <T>{
         PerishableParcel newPerishableParcel = new PerishableParcel(descriptionOfParcel, weightOfParcel,
                 addressOfParcel, sendDay, timeToLive, currentDay);
         int index = -1;
-        if(allParcels.contains(newPerishableParcel)){
+        if (allParcels.contains(newPerishableParcel)) {
             index = allParcels.indexOf(newPerishableParcel);
         }
-        if (index==-1){
+        if (index == -1) {
             System.out.println("Посылка не найдена");
             return;
         }
-        Parcel found = allParcels.get(index); //здесь и ниже использовался ИИ
+        Parcel found = allParcels.get(index); //начиная от сюда и до конца метода использовался ИИ
         if (found instanceof PerishableParcel perishable) {
             System.out.println(perishable.isExpired()
                     ? "Посылка испортилась"
@@ -309,5 +304,54 @@ public class DeliveryApp <T>{
         } else {
             System.out.println("Это не скоропортящаяся посылка");
         }
+    }
+
+    private ParcelBox<Parcel> box;
+
+    @Test
+    void shouldNotAddStandardParcelInStandardBox() {
+        box = new ParcelBox<>(50, "тестовая коробка");
+        Parcel standardParcel = new StandardParcel("описание", 60, "адрес доставки", 5);
+        box.addParcel(box, standardParcel);
+        boolean isParcelInBox = box.isParcelInBox(standardParcel);
+        assertFalse(isParcelInBox);
+    }
+    @Test
+    void shouldAddStandardParcelInStandardBox(){
+        box = new ParcelBox<>(50, "тестовая коробка");
+        Parcel standardParcel = new StandardParcel("описание", 30, "адрес доставки", 5);
+        box.addParcel(box, standardParcel);
+        boolean isParcelInBox = box.isParcelInBox(standardParcel);
+        assertTrue(isParcelInBox);
+    }
+    @Test
+    void parcelShouldBeExpired(){
+        box = new ParcelBox<>(50, "тестовая коробка");
+        PerishableParcel perishableParcel = new PerishableParcel("описание", 30,
+                "адрес доставки", 5, 6, 1);
+        assertTrue(perishableParcel.isExpired());
+    }
+    @Test
+    void parcelShouldNotBeExpired(){
+        box = new ParcelBox<>(50, "тестовая коробка");
+        PerishableParcel perishableParcel = new PerishableParcel("описание", 30,
+                "адрес доставки", 5, 3, 1);
+        assertFalse(perishableParcel.isExpired());
+    }
+    @Test
+    void shouldCalculateDeliveryCostForStandardParcel(){
+        Parcel parcel = new StandardParcel("описание", 30, "адрес доставки", 5);
+        assertEquals(60, parcel.calculateDeliveryCost());
+    }
+    @Test
+    void shouldCalculateDeliveryCostForFragileParcel(){
+        Parcel parcel = new FragileParcel("описание", 30, "адрес доставки", 5);
+        assertEquals(120, parcel.calculateDeliveryCost());
+    }
+    @Test
+    void shouldCalculateDeliveryCostForPerishableParcel(){
+        PerishableParcel parcel = new PerishableParcel("описание", 30,
+                "адрес доставки", 5, 3, 1);
+        assertEquals(90, parcel.calculateDeliveryCost());
     }
 }
