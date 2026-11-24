@@ -8,22 +8,22 @@ abstract public class Parcel {
     protected int baseCost = 2;
 
 
-    Parcel(String description, int weight, String deliveryAddress, int sendDay) {
+    public Parcel(String description, int weight, String deliveryAddress, int sendDay) {
         this.description = description;
         this.weight = weight;
         this.deliveryAddress = deliveryAddress;
         this.sendDay = sendDay;
     }
 
-    void packageItem() {
+    public void packageItem() {
         System.out.println("Посылка " + description + " упакована");
     }
 
-    void deliver() {
+    public void deliver() {
         System.out.println("Посылка " + description + " доставлена по адресу " + deliveryAddress);
     }
 
-    int calculateDeliveryCost() {
+    public int calculateDeliveryCost() {
         int cost = weight * baseCost;
         return cost;
     }
